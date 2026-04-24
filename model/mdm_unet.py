@@ -850,11 +850,13 @@ class MDM_UNET(nn.Module):
 
     def _apply(self, fn):
         super()._apply(fn)
-        self.rot2xyz.smpl_model._apply(fn)
+        if self.rot2xyz.smpl_model is not None:
+            self.rot2xyz.smpl_model._apply(fn)
 
     def train(self, *args, **kwargs):
         super().train(*args, **kwargs)
-        self.rot2xyz.smpl_model.train(*args, **kwargs)
+        if self.rot2xyz.smpl_model is not None:
+            self.rot2xyz.smpl_model.train(*args, **kwargs)
 
 
 class PositionalEncoding(nn.Module):

@@ -104,7 +104,9 @@ celerybeat.pid
 
 # Environments
 .env
+.env_condmdi/
 .venv
+.tools/
 env/
 venv/
 ENV/
@@ -132,6 +134,7 @@ dmypy.json
 
 # experiments
 save/
+body_models/
 dataset/
 kit/
 t2m/

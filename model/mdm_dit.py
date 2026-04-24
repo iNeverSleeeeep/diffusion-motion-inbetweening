@@ -374,6 +374,10 @@ class MDM_DiT(nn.Module):
         self.num_actions = num_actions
         self.data_rep = data_rep
         self.dataset = dataset
+        self.keyframe_conditioned = kargs.get('keyframe_conditioned', False)
+        self.keyframe_selection_scheme = kargs.get(
+            'keyframe_selection_scheme', 'random_frames')
+        self.zero_keyframe_loss = kargs.get('zero_keyframe_loss', False)
 
         self.pose_rep = pose_rep
         self.glob = glob
@@ -612,11 +616,13 @@ class MDM_DiT(nn.Module):
 
     def _apply(self, fn):
         super()._apply(fn)
-        self.rot2xyz.smpl_model._apply(fn)
+        if self.rot2xyz.smpl_model is not None:
+            self.rot2xyz.smpl_model._apply(fn)
 
     def train(self, *args, **kwargs):
         super().train(*args, **kwargs)
-        self.rot2xyz.smpl_model.train(*args, **kwargs)
+        if self.rot2xyz.smpl_model is not None:
+            self.rot2xyz.smpl_model.train(*args, **kwargs)
 
 
 class PositionalEncoding(nn.Module):

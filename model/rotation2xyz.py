@@ -12,7 +12,12 @@ class Rotation2xyz:
     def __init__(self, device, dataset='amass'):
         self.device = device
         self.dataset = dataset
-        self.smpl_model = SMPL().eval().to(device)
+        self.smpl_model = None
+
+    def _get_smpl_model(self):
+        if self.smpl_model is None:
+            self.smpl_model = SMPL().eval().to(self.device)
+        return self.smpl_model
 
     def __call__(self, x, mask, pose_rep, translation, glob,
                  jointstype, vertstrans, betas=None, beta=0,
@@ -59,11 +64,12 @@ class Rotation2xyz:
             rotations = rotations[:, 1:]
 
         if betas is None:
-            betas = torch.zeros([rotations.shape[0], self.smpl_model.num_betas],
+            smpl_model = self._get_smpl_model()
+            betas = torch.zeros([rotations.shape[0], smpl_model.num_betas],
                                 dtype=rotations.dtype, device=rotations.device)
             betas[:, 1] = beta
             # import ipdb; ipdb.set_trace()
-        out = self.smpl_model(body_pose=rotations, global_orient=global_orient, betas=betas)
+        out = self._get_smpl_model()(body_pose=rotations, global_orient=global_orient, betas=betas)
 
         # get the desirable joints
         joints = out[jointstype]
